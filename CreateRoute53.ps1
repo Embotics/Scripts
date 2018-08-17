@@ -181,6 +181,7 @@ powershell.exe C:\Scripts\CreateRoute53.ps1 '#{target.remoteId}' '#{target.id}' 
     $Change.ResourceRecordSet = New-Object Amazon.Route53.Model.ResourceRecordSet
     $Change.ResourceRecordSet.Name = "$VMname.$Domain"
     $Change.ResourceRecordSet.Type = $Type
+    $Change.ResourceRecordSet.region = $Region
     $Change.ResourceRecordSet.TTL = $TTL
     $Change.ResourceRecordSet.SetIdentifier = "vCommander"
     #$Change.ResourceRecordSet.ResourceRecords.Add(@{Value=$Value})
