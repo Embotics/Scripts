@@ -135,7 +135,8 @@ powershell.exe C:\Scripts\CreateRoute53.ps1 '#{target.remoteId}' '#{target.id}' 
 
 #Check Instance for Elastic IP to continue.
     $Elastic_Address = Get-EC2Address -Filter @{ Name="instance-id";Value="$Instance" }
-     IF(($Elastic_Address -eq $null) -and ($ForceCreateFlag -eq 'yes')){
+    $Non_ElasticpublicIP = (Get-EC2Instance -InstanceId $Instance).Instances.PublicIpAddress
+     IF(($Elastic_Address -eq $null) -and ($Non_ElasticpublicIP -eq $null) -and ($ForceCreateFlag -eq 'yes')){
         Try{$address = New-EC2Address -Domain "Vpc"
             $Status = Register-EC2Address -InstanceId $Instance -AllocationId $address.AllocationId
             $value = $address.PublicIp
@@ -151,8 +152,8 @@ powershell.exe C:\Scripts\CreateRoute53.ps1 '#{target.remoteId}' '#{target.id}' 
             Catch{$error[0] | Format-List -Force
                  Exit 1;
                  }}
-        Elseif($Elastic_Address -ne $null){
-                #Set Custom attribute if Elastic IP set 
+        Elseif(($Elastic_Address -eq $null) -and ($Non_ElasticpublicIP -ne $null)){
+                    #Set Custom attribute if Elastic IP set 
                     $attributeDTO1 = New-DTOTemplateObject -DTOTagName "CustomAttribute"
                     $attributeDTO1.CustomAttribute.allowedValues = @() #not important
                     $attributeDTO1.CustomAttribute.description = $null #not important
@@ -160,14 +161,27 @@ powershell.exe C:\Scripts\CreateRoute53.ps1 '#{target.remoteId}' '#{target.id}' 
                     $attributeDTO1.CustomAttribute.name= $Attrib1
                     $attributeDTO1.CustomAttribute.value = "Yes"
                     $result = Set-Attribute -vmId  $vCmdrID -customAttributeDTo $attributeDTO1
-            }
+                    $Value = $Non_ElasticpublicIP
+                    }
+        Elseif(($Elastic_Address -ne $null) -and ($Non_ElasticpublicIP -ne $null)){
+                    #Set Custom attribute if Elastic IP set 
+                    $attributeDTO1 = New-DTOTemplateObject -DTOTagName "CustomAttribute"
+                    $attributeDTO1.CustomAttribute.allowedValues = @() #not important
+                    $attributeDTO1.CustomAttribute.description = $null #not important
+                    $attributeDTO1.CustomAttribute.targetManagedObjectTypes = @()  #not important
+                    $attributeDTO1.CustomAttribute.name= $Attrib1
+                    $attributeDTO1.CustomAttribute.value = "Yes"
+                    $result = Set-Attribute -vmId  $vCmdrID -customAttributeDTo $attributeDTO1
+                    $Value = $Elastic_Address
+                    }
+
         Else {Write-host "Exiting because the target instance does not have an elastic IP"
             Exit 1
             }
 
-#Pull the existing or created values from the Instance
-    $instancedata = Get-EC2Instance -InstanceId $Instance
-    $Value = $instancedata.Instances.PublicIPAddress
+#Pull the existing or created values from the Instance   **** No longer needed ****
+   # $instancedata = Get-EC2Instance -InstanceId $Instance
+   # $Value = $instancedata.Instances.PublicIPAddress
     
 #Remove the Spaces from the name if they exist
     $VMname = $Vmname.replace(' ','')
@@ -223,3 +237,4 @@ powershell.exe C:\Scripts\CreateRoute53.ps1 '#{target.remoteId}' '#{target.id}' 
         }
     
 #End
+
