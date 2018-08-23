@@ -115,7 +115,7 @@ add-type @"
     }"
 
 #perform Remove 
-    Try{$DeleteURL = $phpipamURL +"/api/$phpipamAppID/addresses/$IPAddress/"+"$IPSubnetID"
+    Try{$DeleteURL = $phpipamURL +"/api/$phpipamAppID/addresses/$IPAddress/"+"$IPSubnetID/"
         $Delete = Invoke-WebRequest -Uri $DeleteURL -Headers $phpipamsessionHeader -Method Delete -ContentType $contentType
         #$DeleteURL1 = $phpipamURL +"/api/$phpipamAppID/addresses/$IPAddress"
         #$Delete1 = Invoke-WebRequest -Uri $DeleteURL -Headers $phpipamsessionHeader -Body $JSONbody -Method DELETE -ContentType $contentType
