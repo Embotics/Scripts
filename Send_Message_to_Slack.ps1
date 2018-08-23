@@ -8,7 +8,7 @@ Slack requires a token to authenticate to an org. Either place a file named toke
 or provide the token using the -token parameter. For more details on Slack tokens, use Get-Help with the -Full arg.  Thanks to Chris Wahl for the example code.
 .EXAMPLE
 powershell.exe c:\scripts\slack\send_message_to_slack.ps1 -channel '#{request.service.settings.customAttribute['Notify Slack Channel']}' -message 'Recently deployed  VM/Instance #{target.Name} on #{target.managedSystem.type}'   
-This will send a message to the #General channel using a specific token 1234567890, and the bot's name will be default (PowerShell Bot).
+This will send a message to the #General channel using a specific token 1234567890, and the bot's name will be default (vCommander Bot).
 .LINK
 Validate or update your Slack tokens:
 https://api.slack.com/tokens

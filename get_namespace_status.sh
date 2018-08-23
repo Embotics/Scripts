@@ -4,7 +4,7 @@
 #
 # This script will get the status of each component in the
 # provided namespace
-#
+
 
 K8SNS=$1
 FINISHED=no

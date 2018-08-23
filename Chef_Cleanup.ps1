@@ -9,7 +9,7 @@
     3.
 
 .DESCRIPTION
-Designed to be run as a Sheduled task in Windows, every 1hr. 
+Designed to be run as a Sheduled task in vCommander.
 This script finds requests that have failed for a particular reason (e.g. Chef failure), after a configurable time.
 - Create command workflow that deletes Chef node, powers off VM, deletes VM. 
 - Reject request via API, and provide a reject reason that will get emailed to the requestor. Needs to consider rejection error reasons for multi-VM failures, and for failures other than Chef (e.g. It just took too long). 
