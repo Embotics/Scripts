@@ -31,7 +31,7 @@ powershell.exe c:\Scripts\Infoblox\infoblox_CreateArecord.ps1 -DnsName "#{target
     #infoblox Info
     $infobloxURL = "https://10.10.20.10"        # infoblox Base URL
     $infoBloxCred = "c:\Scripts\infoblox.xml"   # Encrypted Credfile for Infoblo
-    $Zone = "bullet.local"                     # Zone to add records    
+    $Zone = "test.local"                     # Zone to add records    
 
 ########################################################################################################################
 # Nothing to configure below this line - Starting the main function of the script
@@ -50,7 +50,7 @@ powershell.exe c:\Scripts\Infoblox\infoblox_CreateArecord.ps1 -DnsName "#{target
                         Start-Sleep 1}
 
 ########################################################################################################################
-# Setting Cert Policy - required for successful auth with the infoblox API if set to https
+# Setting Cert Policy - required for successful auth with the infoblox API if infoblox is unsigned
 ########################################################################################################################
 add-type @"
     using System.Net;
@@ -65,8 +65,6 @@ add-type @"
 "@
 [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12;
-[System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
-
 
 #Setup Auth to Infoblox
     $iCred = New-DecryptCredential $infoBloxCred
@@ -77,35 +75,32 @@ add-type @"
     $contentType = "application/json"
 
 #Only grab the first(primary)address if there are more than one
-    $Address = ($ADDRESS.split(","))[0]
+    IF($Address.count -gt "1"){
+        $Address = ($ADDRESS.split(","))[0]
+        }
 
 #force Dnsname to lowercase to be handled by infoblox correctly
     $DNSName = $DNSName.ToLower()
 
 #Parse name from .domin.com or .local and ensure proper Zone name
-   $Name = ($DNSName.split("."))[0]
-   $DomainName = "$name"+"."+"$Zone"
-
-#Write out for Comments/Debug
-    Write-debug "Address = $ADDRESS"
-    Write-debug "DNSName = $DomainName"
+    IF($DNSName -like "*.*"){
+    $Name = ($DNSName.split("."))[0]
+    $DomainName = "$name"+"."+"$Zone"}
+        Else{$DomainName = "$DNSName"+"."+"$Zone"
+            }
 
 #Post to Infoblox
     $New_RecordURL=  $infobloxURL +"/wapi/v2.6/record:a"
     $JSONbody = "{`"ipv4addr`":'$ADDRESS',`"name`":'$DomainName'}" | ConvertFrom-Json | ConvertTo-Json
-    try{
-    $Result = Invoke-RestMethod -Uri $New_RecordURL -Headers $headers -Method Post -Body $JSONbody -ContentType $contentType
-    }
-    catch
-    {
-            $result = $_.Exception.Response.GetResponseStream()
-            $reader = New-Object System.IO.StreamReader($result)
-            $reader.BaseStream.Position = 0
-            $reader.DiscardBufferedData()
-            $responseBody = $reader.ReadToEnd();
-            Write-Host $responseBody
-    }
-    
+	$Record_result = Invoke-WebRequest -Uri $New_RecordURL -Headers $headers -Method Post -Body $JSONbody -ContentType $contentType
+    $StatusCode = $Record_result.StatusCode
+    $StatusDescription = $Record_result.StatusDescription
+	Write-host "Record Created with Status Code $StatusCode - $StatusDescription"
+	
+
+
+
+ 
 
 
 
