@@ -1,7 +1,7 @@
 ﻿<#
 Description: Script that Calls out to IPAM to get the next available IP address for the VM in the request based on the Service Type Attribute on the request form in vCommander.
 Requirements: 
--VComamnder 7.0.2 or higher
+-VComamnder 7.0 or higher
 -Powershell V4 or greater
 -PhpIpam 1.3.1 or greater
 
@@ -28,13 +28,13 @@ powershell.exe c:\Scripts\phpipam\phpipam_nextIP.ps1 -RequestID "#{request.id}" 
 # Configure the variables below using the Production vCommander & ZVM.
 ################################################
     #phpipam Info
-    $phpipamURL = "http://Address/phpipam"         #Phpipam Base URL
+    $phpipamURL = "http://10.10.12.22/phpipam"         #Phpipam Base URL
     $phpipamCred = "C:\scripts\phpipam.pwd"           #Encrypted CredFile for Phpipam
     $phpipamAppID = "vcommander"                     #AppID in svrphpipam Set to "None" for security to use password auth only not token auth. 
     $Description = "Created by vCommander"         #Tag for each Entry Created in phpipam so admin's know the source
     #vCommander Info
     $vCredFile = "c:\Scripts\superuser.xml"           #Encrypted Credfile for vCommander
-    $vCommanderURL = "https://localhost"    #VCommander URL
+    $vCommanderURL = "https://bullet.pv.embotics.com"    #VCommander URL
 
 ########################################################################################################################
 # Logic to Align Service Type Attribute to subnetID and network in PhPiPAM
@@ -168,7 +168,7 @@ powershell.exe c:\Scripts\phpipam\phpipam_nextIP.ps1 -RequestID "#{request.id}" 
             $components = $service.components.name
             foreach ($component in $components) {
                 $componentName = $component
-                $PostParamsURL = $vCommanderURL+'/rest/v3/servicerequests/'+$RequestId+'/services/'+$serviceName+'/components/'+$componentName+'/deploymentparameters'
+                $PostParamsURL = $vCommanderURL+'/rest/v3/service-requests/'+$RequestId+'/services/'+$serviceName+'/components/'+$componentName+'/deployment-parameters'
 
             #Perform Get Request for next available IP from phpipam
                 $nextFreeURL = $phpipamURL +"/api/$phpipamAppID/addresses/first_free/$subnetid/"
@@ -184,8 +184,7 @@ powershell.exe c:\Scripts\phpipam\phpipam_nextIP.ps1 -RequestID "#{request.id}" 
 
 #Setup Json param body to post to the service
 $postBody = @"
-    {
-    "deployment_parameters": {
+    {  
         "nics": [
                     {
                         "ip": "$nextFreeIP",
@@ -197,7 +196,6 @@ $postBody = @"
                     }
             ]
         }
-    }
 "@
 #Write-Host $postBody
             Try{$postJSON = Invoke-WebRequest -contentType "application/json" -Uri $PostParamsURL -Method POST -Body $postBody -Credential $vCred
