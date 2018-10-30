@@ -28,13 +28,13 @@ powershell.exe c:\Scripts\phpipam\phpipam_nextIP.ps1 -RequestID "#{request.id}" 
 # Configure the variables below using the Production vCommander & ZVM.
 ################################################
     #phpipam Info
-    $phpipamURL = "http://10.10.12.22/phpipam"         #Phpipam Base URL
+    $phpipamURL = "http://5.5.5.5/phpipam"         #Phpipam Base URL
     $phpipamCred = "C:\scripts\phpipam.pwd"           #Encrypted CredFile for Phpipam
     $phpipamAppID = "vcommander"                     #AppID in svrphpipam Set to "None" for security to use password auth only not token auth. 
     $Description = "Created by vCommander"         #Tag for each Entry Created in phpipam so admin's know the source
     #vCommander Info
     $vCredFile = "c:\Scripts\superuser.xml"           #Encrypted Credfile for vCommander
-    $vCommanderURL = "https://bullet.pv.embotics.com"    #VCommander URL
+    $vCommanderURL = "https://localhost"    #VCommander URL
 
 ########################################################################################################################
 # Logic to Align Service Type Attribute to subnetID and network in PhPiPAM
