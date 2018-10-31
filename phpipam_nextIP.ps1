@@ -1,7 +1,7 @@
 ﻿<#
 Description: Script that Calls out to IPAM to get the next available IP address for the VM in the request based on the Service Type Attribute on the request form in vCommander.
 Requirements: 
--VComamnder 6.1.x or higher
+-VComamnder 6.1.x
 -Powershell V4 or greater
 -PhpIpam 1.3.1 or greater
 
