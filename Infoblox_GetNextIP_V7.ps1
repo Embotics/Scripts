@@ -166,17 +166,6 @@ add-type @"
                 Exit 1
                 }
 
-#Setup request body to Assign name to the IP address
-    $JSONbody = 
-    "{
-	  ""name"": ""reserved.$domainName"",
-	  ""ipv4addrs"": [
-		{
-		  ""ipv4addr"": ""func:nextavailableip:$infobloxNetmask""
-		}
-	  ]
-	}"
-
 #Service requests
     Try{$serviceRequests = $convertedJson.services
         $ServicesURL = $vCommanderURL+'/rest/v3/services'
