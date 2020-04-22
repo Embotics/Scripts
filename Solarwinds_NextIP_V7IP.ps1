@@ -148,7 +148,6 @@ add-type @"
             #Setup Json param body to post to the service
 $postBody = @"
     {
-    "deployment_parameters": {
         "nics": [
                     {
                         "ip": "$nextFreeIP",
@@ -160,7 +159,6 @@ $postBody = @"
                     }
             ]
         }
-    }
 "@
             #  Write-Host $postBody
             Try{$postJSON = Invoke-WebRequest -contentType "application/json" -Uri $PostParamsURL -Method POST -Body $postBody -Credential $vCred
