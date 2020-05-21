@@ -1,4 +1,4 @@
-﻿<#
+<#
 Usage, add user to multiple organizations via API. 
 Requires Powershell V4 and Embotics vCommander Rest API V2.8
 Tested against vCommander 6.1.X
@@ -55,6 +55,20 @@ Tested against vCommander 6.1.X
 #Update Organizations
     foreach($org in $Organizations){
         $orgDto = Get-OrganizationByName -name $org
-        $orgDto.Organization.Members += $user1DTO.OrganizationUser
+	
+	#Check if the Organization has any members, if not insert the Members property
+	if (!($orgDto.Organization.Members))
+	{
+		Add-Member -InputObject $orgDto.Organization -MemberType NoteProperty -Name "Members" -Value $user1DTO.OrganizationUser -Force
+	}
+	#Else, if the Organization has members, clone the member list and add the user to it before adding the cloned list back to the Organization DTO
+	else
+	{
+		$existingMembers = $orgDto.Organization.Members
+		$orgDto.Organization.Members = @()
+		$orgDto.Organization.Members += $existingMembers
+		$orgDto.Organization.Members += $user1DTO.OrganizationUser
+	}
+	
         $taskInfo = Update-Organization -Id $orgDto.Organization.id -dto $orgDto
         }
