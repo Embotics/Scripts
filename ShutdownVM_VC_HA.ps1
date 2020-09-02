@@ -1,7 +1,7 @@
 ﻿<#
 Requirements: 
--VComamnder 6.1.4 or higher
--Powershell V4 or greater
+-Comamnder 8.0.0 or higher
+-Powershell V5 or greater
 
 Connect to VC and shutdown VM
 #>        
